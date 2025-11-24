@@ -45,4 +45,130 @@ body {
 }
 .card {
     max-width: 480px;
-    margin: 30px au
+    margin: 30px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(0,0,255,0.07);
+}
+.input {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #d8d8d8;
+    border-radius: 10px;
+    font-size: 15px;
+    transition: 0.2s;
+}
+.input:focus {
+    border-color: #3b82f6;
+}
+.button {
+    width: 100%;
+    padding: 14px;
+    background: #3b82f6;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: 0.2s;
+}
+.button:hover {
+    background: #2563eb;
+}
+.result-box {
+    background: #eef4ff;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 10px;
+    text-align: left;
+}
+.copy-btn {
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    margin-top: 10px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.footer {
+    text-align: center;
+    margin-top: 60px;
+    padding: 20px;
+    color: #6b7280;
+    font-size: 14px;
+}
+a.short-link {
+    color: #3b82f6;
+    text-decoration: underline;
+    word-break: break-all;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <div class="container">
+        <div class="logo">Shortify</div>
+    </div>
+</div>
+
+<div class="hero">
+    <h1>Fast & Simple URL Shortener</h1>
+    <p>Paste your long URL below and generate a clean short link instantly.</p>
+</div>
+
+<div class="card">
+    <input id="longUrl" type="text" class="input" placeholder="Enter your long URL here...">
+    <button class="button" onclick="shorten()">Generate Short Link</button>
+    <div id="result"></div>
+</div>
+
+<div class="footer">
+    © 2025 Shortify — Simple URL Shortener
+</div>
+
+<script>
+function shorten() {
+    const url = document.getElementById("longUrl").value.trim();
+    if(!url){
+        document.getElementById("result").innerHTML = "<p style='color:red;'>⚠️ Please enter a valid URL.</p>";
+        return;
+    }
+
+    document.getElementById("result").innerHTML = "<p style='color:#6b7280;'>Generating short link...</p>";
+
+    fetch(`https://is.gd/create.php?format=simple&url=${encodeURIComponent(url)}`)
+        .then(res => res.text())
+        .then(shortUrl => {
+            // Buat input tersembunyi untuk copy button
+            const oldInput = document.getElementById("shortUrl");
+            if(oldInput) oldInput.remove();
+            const input = document.createElement("input");
+            input.id = "shortUrl";
+            input.value = shortUrl;
+            input.style.display = "none";
+            document.body.appendChild(input);
+
+            document.getElementById("result").innerHTML = `
+                <div class='result-box'>
+                    <strong>Your Short Link:</strong><br>
+                    <a href="${shortUrl}" target="_blank" class="short-link">${shortUrl}</a>
+                    <button class="copy-btn" onclick="copyLink()">Copy Link</button>
+                    <p id="copyMsg" style="color:green;display:none;margin-top:5px;">✔️ Copied!</p>
+                </div>
+            `;
+        })
+        .catch(err => {
+            document.getElementById("result").innerHTML = "<p style='color:red;'>❌ Error generating short link. Try again.</p>";
+        });
+}
+
+function copyLink() {
+    const copyText = document.getElementById("shortUrl");
+    navigator.clipboard.writeText(copyText.value).then(() => {
+        document.getElementById("copyMsg").
